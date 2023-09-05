@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import React from "react";
+import { RecoilRoot } from "../src/recoil-root";
 import { ThemeProvider } from "../src/ui";
 import "./globals.css";
 
@@ -17,10 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </ThemeProvider>
+    <RecoilRoot>
+      <ThemeProvider>
+        <html lang="en">
+          <body className={inter.className}>{children}</body>
+        </html>
+      </ThemeProvider>
+    </RecoilRoot>
   );
 }

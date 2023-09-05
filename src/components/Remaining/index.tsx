@@ -1,5 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useRecoilValue } from "recoil";
+import {
+  decompositionRemainingSecondsState,
+  drunkTimeEpochState,
+} from "../../atoms";
 import {
   Button,
   Popover,
@@ -9,14 +14,10 @@ import {
 } from "../../ui";
 import { RelativeTime } from "../RelativeTime";
 
-export interface RemainingProps {
-  remainingSeconds: number;
-  fromTimeEpoch: number;
-}
-
-export function Remaining(props: RemainingProps) {
+export function Remaining() {
+  const remainingSeconds = useRecoilValue(decompositionRemainingSecondsState);
+  const currentTime = useRecoilValue(drunkTimeEpochState);
   const [isOpen, setIsOpen] = useState(false);
-  const { remainingSeconds, fromTimeEpoch } = props;
   return (
     <Popover open={isOpen} placement="bottom" handler={setIsOpen}>
       <PopoverHandler>
@@ -28,7 +29,7 @@ export function Remaining(props: RemainingProps) {
       <PopoverContent className="z-50 max-w-[24rem]">
         <Typography>
           <RelativeTime
-            dateTime={new Date(fromTimeEpoch + remainingSeconds * 1000)}
+            dateTime={new Date(currentTime + remainingSeconds * 1000)}
           />
           に分解
         </Typography>

@@ -1,10 +1,7 @@
 import { ChangeEventHandler, MouseEventHandler } from "react";
+import { useRecoilState } from "recoil";
+import { drunkTimeEpochState } from "../../atoms";
 import { Button, Input } from "../../ui";
-
-export interface DrunkTimeProps {
-  drunkAt: Date;
-  setDrunkAt: (time: Date) => void;
-}
 
 const pattern = /^([0-9]{2}):([0-9]{2})$/;
 
@@ -16,8 +13,9 @@ const format = (d: Date): string => {
   }${minutes}`;
 };
 
-export function DrunkTime(props: DrunkTimeProps) {
-  const { drunkAt, setDrunkAt } = props;
+export function DrunkTime() {
+  const [drunkTimeEpoch, setDrunkTime] = useRecoilState(drunkTimeEpochState);
+  const drunkTime = new Date(drunkTimeEpoch);
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     event.preventDefault();
     const match = pattern.exec(event.target.value);
@@ -27,17 +25,17 @@ export function DrunkTime(props: DrunkTimeProps) {
     const hours = parseInt(match[1], 10);
     const minutes = parseInt(match[2], 10);
     const nd = new Date(
-      drunkAt.getFullYear(),
-      drunkAt.getMonth(),
-      drunkAt.getDate(),
+      drunkTime.getFullYear(),
+      drunkTime.getMonth(),
+      drunkTime.getDate(),
       hours,
       minutes
     );
-    setDrunkAt(nd);
+    setDrunkTime(nd.valueOf());
   };
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    setDrunkAt(new Date());
+    setDrunkTime(Date.now());
   };
   return (
     <div className="relative flex w-full max-w-[24rem]">
@@ -49,7 +47,7 @@ export function DrunkTime(props: DrunkTimeProps) {
         containerProps={{
           className: "min-w-0",
         }}
-        value={format(drunkAt)}
+        value={format(drunkTime)}
         pattern="[0-9]{2}:[0-9]{2}"
         onChange={handleChange}
       />

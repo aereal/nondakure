@@ -1,22 +1,16 @@
 "use client";
 
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { ChangeEventHandler, MouseEventHandler, useState } from "react";
+import { ChangeEventHandler, MouseEventHandler } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { drunkDrinksState, totalAlcholVolumeState } from "../src/atoms";
 import { DrunkTime } from "../src/components/DrunkTime";
 import { Remaining } from "../src/components/Remaining";
-import { decompositionSecondsPerGram, defaultDrinks } from "../src/const";
-import { HardDrink } from "../src/hard-drink";
 import { Button, Card, CardBody, Input, Typography } from "../src/ui";
 
-interface DrunkDrink extends HardDrink {
-  readonly drunkVolume: number;
-}
-
 export default function Home() {
-  const [fromEpoch, setFromEpoch] = useState<number>(Date.now());
-  const [drinks, setDrinks] = useState<DrunkDrink[]>(
-    defaultDrinks.map((d) => ({ ...d, drunkVolume: 0 }))
-  );
+  const [drinks, setDrinks] = useRecoilState(drunkDrinksState);
+  const totalAlcholVolume = useRecoilValue(totalAlcholVolumeState);
   const buildChangeDrunkVolumeHandler =
     (index: number): ChangeEventHandler<HTMLInputElement> =>
     (event) => {
@@ -52,12 +46,6 @@ export default function Home() {
       { name: "", abv: 0, volumeMilliLitre: 0, drunkVolume: 0 },
     ]);
   };
-  const totalAlcholVolume = drinks.reduce<number>(
-    (accum, drink) =>
-      accum + drink.abv * drink.volumeMilliLitre * drink.drunkVolume,
-    0
-  );
-  const remainingSeconds = totalAlcholVolume * decompositionSecondsPerGram;
   return (
     <main className="flex min-h-screen flex-col items-center">
       <Card className="rounded-none w-full">
@@ -66,10 +54,7 @@ export default function Home() {
             アルコール分解時間
           </Typography>
           <div className="w-full">
-            <DrunkTime
-              drunkAt={new Date(fromEpoch)}
-              setDrunkAt={(date) => setFromEpoch(date.valueOf())}
-            />
+            <DrunkTime />
           </div>
           <div className="mt-12 flex flex-col gap-4">
             <div className="flex items-center justify-between gap-8">
@@ -123,10 +108,7 @@ export default function Home() {
           {totalAlcholVolume === 0 ? null : (
             <Card>
               <CardBody>
-                <Remaining
-                  remainingSeconds={remainingSeconds}
-                  fromTimeEpoch={fromEpoch}
-                />
+                <Remaining />
               </CardBody>
             </Card>
           )}
